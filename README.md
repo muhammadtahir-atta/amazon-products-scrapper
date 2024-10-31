@@ -48,9 +48,11 @@ This project is a Django application designed for scraping product data from e-c
    ```bash
    pip install -r requirements.txt
    ```
-5. **Install the required packages:**
+5. **Set the Chromedriver Path:**
 
-  - Also add the correct chromedriver path in scrapping.py file(Download Chromedriver and get the path of chromedriver.exe)
+  - Create .env File.
+  - Download Chromedriver Unzip the folder and  get the path of chromedriver.exe.
+  - Set the path of chomedriver in .env file (Use .env.example for refrence how to add path in.env).
 
 6. **Run the Redis server:**
    - Download and run `redis.exe` if you are on Windows, or start the Redis server using your preferred method on macOS/Linux.
