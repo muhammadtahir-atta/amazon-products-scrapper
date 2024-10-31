@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brand Products</title>
+    <style>
+      /* Styles */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f4;
+      }
+      h1,
+      h2 {
+        text-align: center;
+        color: #333;
+      }
+      select,
+      .pagination button {
+        display: block;
+        margin: 20px auto;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+      li {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin: 10px auto;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+      }
+      img {
+        border-radius: 4px;
+        margin-right: 15px;
+        width: 80px;
+        height: auto;
+      }
+      .product-info h3 {
+        margin: 0 0 5px 0;
+        font-size: 18px;
+        color: #333;
+      }
+      .pagination button {
+        padding: 10px 15px;
+        margin: 0 5px;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+      }
+      .pagination button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+      .pagination {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+    <script>
+      let currentPage = 1;
+      const productsPerPage = 10;
+      let products = [];
+ 
+      async function fetchProducts(brandId) {
+      const response = await fetch(`/api/brands/${brandId}/`);
+        const data = await response.json();
+        products = data.products || [];
+        currentPage = 1;
+        renderProducts();
+      }
+ 
+      function renderProducts() {
+        const productList = document.getElementById("product-list");
+        productList.innerHTML = "";
+ 
+        const start = (currentPage - 1) * productsPerPage;
+        const end = start + productsPerPage;
+        const paginatedProducts = products.slice(start, end);
+ 
+        paginatedProducts.forEach((product) => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <img src="${product.image_url}" alt="${product.name}">
+            <div class="product-info">
+                <h3>${product.name}</h3>
+                <p><strong>ASIN:</strong> ${product.asin}</p>
+                <p><strong>SKU:</strong> ${product.sku || "N/A"}</p>
+            </div>
+          `;
+          productList.appendChild(li);
+        });
+ 
+        updatePagination();
+      }
+ 
+      function updatePagination() {
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+ 
+        const prevButton = document.createElement("button");
+        prevButton.innerText = "Previous";
+        prevButton.disabled = currentPage === 1;
+        prevButton.onclick = () => {
+          currentPage--;
+          renderProducts();
+        };
+        pagination.appendChild(prevButton);
+ 
+        const nextButton = document.createElement("button");
+        nextButton.innerText = "Next";
+        nextButton.disabled = currentPage * productsPerPage >= products.length;
+        nextButton.onclick = () => {
+          currentPage++;
+          renderProducts();
+        };
+        pagination.appendChild(nextButton);
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Select a Brand to View Products</h1>
+    <select id="brand-select" onchange="fetchProducts(this.value)">
+      <option value="">Select a brand</option>
+      {% for brand in brands %}
+            <option value="{{ brand.id }}">{{ brand.name }}</option>
+      {% endfor %}
+    </select>
+ 
+    <h2>Products:</h2>
+    <ul id="product-list"></ul>
+ 
+    <div class="pagination" id="pagination"></div>
+  </body>
+</html>
+ 
